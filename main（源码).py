@@ -103,7 +103,7 @@ class AdbTools(object):
         ######################
         else:
             os.chdir(fileadb)
-            os.system("adb.exe")#激活ADB
+            os.popen("adb.exe").readlines()#激活ADB
             print("done!")
             os.system("cls")
         ######################
@@ -188,15 +188,14 @@ class AdbTools(object):
             while True:
                 os.system("cls")
                 print('\033[1;31m')
-                print('#####DPI修改界面#####\n\n'+'输入数字后回车以选择\n')
+                print('#####DPI修改界面#####\n\n'+'输入数字后回车以选择,输入0返回主界面\n')
                 print('\033[0m')
                 print('注：Physical density为您所连接的设备的原始DPI大小；Override density为您所连接的设备现在的DPI大小。')
                 print('\033[1;32m')
                 print('1、修改DPI大小')
                 print('2、恢复DPI大小')
-                print('3、返回主界面')
                 print('\033[0m')
-                wmsize = os.system("adb.exe "+"-s "+choose+" "+" shell wm density")
+                wmsize = self.all_shell(" shell wm density")
                 print(wmsize)
                 #########################光标↓DPI显示↑
                 print('\033[1;34m')
@@ -208,13 +207,12 @@ class AdbTools(object):
                 elif cho == '1':
                     os.system("cls")
                     print('在下方键入您所需的DPI大小。注：如果您的设备系统为WearOS，DPI小于200时会导致应用无障碍无法打开、蜂窝移动数据设置界面无法进入等问题！')
-                    dpisize = "adb.exe "+"-s "+choose+" "+" shell wm density " + input("DPI数值：")
-                    os.system(dpisize)
+                    self.all_shell(" shell wm density " + input("DPI数值："))
                     input("修改完毕，回车以回到主界面，少数设备需重启后才能生效！")
                     return
                 elif cho == '2':
                     os.system("cls")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell wm density adbet")
+                    self.all_shell(" shell wm density adbet")
                     input("修改完毕，回车以回到主界面，少数设备需重启后才能生效！")
                     return
                 else:
@@ -270,8 +268,8 @@ class AdbTools(object):
                     print('\033[0m')
                     pass
                 else:
-                    install = "adb.exe "+"-s "+choose+" "+" install -r "+luj
-                    ins = os.system(install)
+                    os.system("cls")
+                    ins = self.all_shell(" install -r "+luj)
                     print(ins)
                     input("命令执行成功，如有ERROR报错（或Failure安装失败）则为缺库或为非WearOS设备安装了WearOS专用软件，亦或者APK文件不存在，回车可继续安装")
         except Exception:
@@ -287,9 +285,9 @@ class AdbTools(object):
         port = input("\n请输入您的设备的端口号，如（5555）:")
         IP = input("\n请输入您的设备的IP地址,如（192.168.1.1）:")
         subprocess.run("adb.exe tcpip"+" "+port)
-        cP = "adb.exe connect "+IP
-        input(os.system(cP))
-        ret = str(os.system(cP))
+        cP = self.all_shell(" connect "+IP)
+        input(cP)
+        ret = str(cP)
         if ret == "0":
             print("正在返回主界面……")
             time.sleep(1)
@@ -327,50 +325,57 @@ class AdbTools(object):
                 if xz == '1':
                     os.system("cls")
                     input("回车以截屏:")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell/system/bin/screencap -p /sdcard/screenshot.png")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell/sdcard/screenshot.png %userprofile%\desktop")
+                    self.all_shell(" shell/system/bin/screencap -p /sdcard/screenshot.png")
+                    self.all_shell(" shell/sdcard/screenshot.png %userprofile%\desktop")
                     input("回车以返回主界面：")
                     return
                 if xz == '2':
                     os.system("cls")
                     print("默认录制时间为180s。按Ctrl+C结束录制")
                     input("回车以录屏")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell screenrecord /sdcard/demo.mp4")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell/sdcard./demo.mp4 %userprofile%\desktop")
+                    self.all_shell(" shell screenrecord /sdcard/demo.mp4")
+                    self.all_shell(" shell/sdcard./demo.mp4 %userprofile%\desktop")
                     input("回车以返回主界面：")
                     return
         except Exception:
             os.system("cls")
             input('\033[1;31m'+"您貌似未选择您要调试的设备，回车返回主界面键入“9”选择您要调试的设备后再试！"+'\033[0m')
             return
+        
+    def all_shell(self,command):
+        os.system("adb.exe "+"-s "+choose+" "+command)
     def deviceinfo(self):
         try:
             os.system("cls")
             print('\033[1;32m')
             print("\n您设备的设备型号:")
-            os.system("adb.exe "+"-s "+choose+" "+" -d shell getprop ro.product.model")
+            self.all_shell(" -d shell getprop ro.product.model")
             print("\n您设备的厂商名称:")
-            os.system("adb.exe "+"-s "+choose+" "+" -d shell getprop ro.product.brand")
+            self.all_shell(" -d shell getprop ro.product.brand")
             print("\n您设备的系统版本:")
-            os.system("adb.exe "+"-s "+choose+" "+" shell getprop ro.build.version.release")
+            self.all_shell(" shell getprop ro.build.version.release")
+            print("\n您设备的系统ID：")
+            self.all_shell(" shell settings get secure android_id")
             print("\n您设备的API版本:")
-            os.system("adb.exe "+"-s "+choose+" "+" shell getprop ro.build.version.sdk")
+            self.all_shell(" shell getprop ro.build.version.sdk")
+            print("\n您设备的IMEI：")
+            self.all_shell(" shell service call iphonesubinfo 1")
             print("\n您设备的序列号：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell getprop ro.serialno")
+            self.all_shell(" shell getprop ro.serialno")
             print("\n您设备的mac地址:")
-            os.system("adb.exe "+"-s "+choose+" "+" shell cat /sys/class/net/wlan0/address")
+            self.all_shell(" shell cat /sys/class/net/wlan0/address")
             print("\n您设备的内存信息：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell cat /proc/meminfo")
+            self.all_shell(" shell cat /proc/meminfo")
             print("\n您设备的储存信息：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell df")
+            self.all_shell(" shell df")
             print("\n您设备的内部存储信息：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell df /data")
+            self.all_shell(" shell df /data")
             print("\n您设备sdcard存储信息：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell df /storage/sdcard")
+            self.all_shell(" shell df /storage/sdcard")
             print("\n您设备的分辨率：")
-            os.system("adb.exe "+"-s "+choose+" "+" shell wm size")
+            self.all_shell(" shell wm size")
             print("\n您设备的DPI数值"+'\n注：Physical density为您所连接的设备的原始DPI大小；Override density为您所连接的设备现在的DPI大小。')
-            os.system("adb.exe "+"-s "+choose+" "+" shell wm density")
+            self.all_shell(" shell wm density")
             print("\n")
             print('\033[0m')
             input("以上为您所连接的设备的信息，回车以退出……")
@@ -409,12 +414,13 @@ class AdbTools(object):
                 input("您已选择"+'\033[4;33m'+choose+'\033[0m'+"作为调试设备"+"，回车以返回主界面：")
                 return choose
             except Exception:
-                input("请键入正确的数字，回车以返回主界面：")
+                input("请键入正确的数字，回车以返重试：")
                 
     
     def 激活(self):
         try:
             while True:
+                os.system("cls")
                 print("本功能可快速激活您设备上的授权应用（如Shizuku、黑阀等）\n")
                 print("1、激活黑阀")
                 print("2、激活Shizuku")
@@ -428,28 +434,28 @@ class AdbTools(object):
                 elif ab == '1':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell sh /Android/data/me.piebridge.brevent/brevent.sh")#V2.4.1
-                    os.system("adb.exe "+"-s "+choose+" "+" -d shell sh /Android/data/me.piebridge.brevent/brevent.sh")#V3.6.7.1
+                    self.all_shell(" shell sh /storage/emulated/0/Android/data/me.piebridge.brevent/brevent.sh")#V2.4.1
+                    self.all_shell(" -d shell sh /storage/emulated/0/Android/data/me.piebridge.brevent/brevent.sh")#V3.6.7.1
                 elif ab == '2':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell sh /Android/data/moe.shizuku.privileged.api/files/start.sh")
+                    self.all_shell(" shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh")
                 elif ab == '3':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell sh /Android/data/com.zzzmode.appopsx/opsx.sh")
+                    self.all_shell(" shell sh /storage/emulated/0/Android/data/com.zzzmode.appopsx/opsx.sh")
                 elif ab == '4':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell dpm set-device-owner com.oasisfeng.island/.IslandDeviceAdminReceiver")
+                    self.all_shell(" shell dpm set-device-owner com.oasisfeng.island/.IslandDeviceAdminReceiver")
                 elif ab == '5':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell dpm set-device-owner com.catchingnow.icebox/.receiverDPMReceiver")
+                    self.all_shell(" shell dpm set-device-owner com.catchingnow.icebox/.receiverDPMReceiver")
                 elif ab == '6':
                     os.system('cls')
                     print("命令执行中...")
-                    os.system("adb.exe "+"-s "+choose+" "+" shell sh /Android/data/com.omarea/cache/up.sh")
+                    self.all_shell(" shell sh /storage/emulated/0/Android/data/com.omarea/cache/up.sh")
                 else:
                     os.system('cls')
                     input("请输入正确的数字，回车以重试：")
@@ -475,3 +481,4 @@ if __name__ == '__main__':
     AdbTools()
     pass
         
+
