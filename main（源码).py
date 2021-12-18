@@ -121,7 +121,7 @@ class AdbTools(object):
             
             print('\033[1;32m')
             print("\n输入各选项前的数字以选择↓输入任何非选项字符可刷新已连接的设备列表")
-            print("\n1、 使用无线连接调试您的设备（无需选择要调试的设备）")
+            print("\n1、 使用无线连接调试您的设备（有选项需选择要调试的设备）")
             print("2、 安装APK文件")
             print("3、 改变DPI大小")
             print("4、 ADB SHELL")
@@ -150,21 +150,21 @@ class AdbTools(object):
             print('\033[0m')
             #####################光标↑判断输入↓
             if com == '1':
-                self.cw()
+                self.无线连接()
             elif com == '2':
-                self.instalapk()
+                self.安装APK()
             elif com == '3':
-                self.dpi()
+                self.更改DPI()
             elif com == '4':
                 self.shell()
             elif com == '5':
-                self.adbcommandline()
+                self.ADB命令行()
             elif com == '6':
-                self.ss()
+                self.截屏()
             elif com == '7':
-                self.deviceinfo()
+                self.设备信息()
             elif com == '8':
-                self.dw()
+                self.断开无线调试()
             elif com == '9':
                 self.选择设备()
             elif com == '10':
@@ -172,17 +172,17 @@ class AdbTools(object):
             elif com == '11':
                 self.关于()
             elif com == '12':
-                self.pexit()
+                self.退出()
             #########################判断输入↑def体↓
                 
-    def pexit(self):#退出
+    def 退出(self):#退出
         os.system("cls")
         result = 主体()  # <15>
         print(result)
         time.sleep(1)
         sys.exit()
         
-    def dpi(self):#更改DPI
+    def 更改DPI(self):#更改DPI
         os.system("cls")
         try:
             while True:
@@ -247,7 +247,7 @@ class AdbTools(object):
             input('\033[1;31m'+"您貌似未选择(连接)您要调试的设备，回车返回主界面后键入“9”选择您要调试的设备后再试！"+'\033[0m')
             return
         
-    def instalapk(self):#安装APK文件
+    def 安装APK(self):#安装APK文件
         try:
             while True:
                 os.system("cls")
@@ -277,39 +277,64 @@ class AdbTools(object):
             input('\033[1;31m'+"您貌似未选择您要调试的设备，回车返回主界面键入“9”选择您要调试的设备后再试！"+'\033[0m')
             return
 
-    def cw(self):#无线连接
-        os.system("cls")
-        print('\033[1;31m')
-        print("#####无线连接#####\n\n请打开您设备上的“WLAN调试”或者“通过无线调试”选项，且您的设备需和您的电脑在同一区域网内，且路由器的“AP隔离”为关闭状态")
-        print('\033[0m')
-        port = input("\n请输入您的设备的端口号，如（5555）:")
-        IP = input("\n请输入您的设备的IP地址,如（192.168.1.1）:")
-        subprocess.run("adb.exe tcpip"+" "+port)
-        cP = self.all_shell(" connect "+IP)
-        input(cP)
-        ret = str(cP)
-        if ret == "0":
-            print("正在返回主界面……")
-            time.sleep(1)
-        elif ret == "1":
+    def 无线连接(self):#无线连接
+        while True:
             os.system("cls")
-            input("请勿输入空IP,回车以返回主界面……")
-        return
+            print("#####无线调试界面#####\n\n请打开您设备上的“WLAN调试”或者“通过无线调试”选项，且您的设备需和您的电脑在同一区域网内，且路由器的“AP隔离”为关闭状态")
+            print("1、USB转wlan调试")
+            print("2、输入IP和端口进行wlan调试（无需选择要调试的设备）")
+            afd = input("\n请选择您的调试方法，键入其他字符以返回主界面：")
+            if afd == '1':
+                try:
+                    os.system("cls")
+                    mat = re.compile(str(r"192.168"))
+                    resu = mat.findall(str(choose))
+                    if resu == ['192.168']:
+                        input("您的设备已为wifi连接设备，无需再转为wlan调试，回车以返回主界面：")
+                        break
+                    else:
+                        pass
+                    port1 = self.all_shell(" tcpip 5555")
+                    IP1 = self.all_shell(" shell netcfg")
+                    print(self.all_shell(" connect "+IP1+':'+"5555"))
+                    input()
+                except Exception:
+                    os.system("cls")
+                    input('\033[1;31m'+"您貌似未选择您要调试的设备，回车返回主界面键入“9”选择您要调试的设备后再试！"+'\033[0m')
+                    return
+            elif afd == '2':
+                os.system("cls")
+                print('\033[1;31m')
+                print('\033[0m')
+                os.system("cls")
+                print("点击您设备连接的网络即可查看设备的IP地址")
+                port = str(input("\n请输入您的设备的端口号，如（5555）:"))
+                IP = str(input("\n请输入您的设备的IP地址,如（192.168.1.1）:"))
+                cP = os.popen("adb connect "+IP+':'+port).read()
+                match = re.compile(r"connected to ")
+                match1 = re.compile(r"unable to connect")
+                result = match.findall(cP)
+                result1 = match1.findall(cP)
+                if result == ['connected to ']:
+                    os.system("cls")
+                    input("设备已连接！回车以返回主界面")
+                    return
+                elif result1 == ['unable to connect']:
+                    os.system("cls")
+                    input("设备未能连接，请检查您是否输入了正确的IP地址和端口号，检查设备是否开启“WLAN调试”！回车以返回选择界面")
+                elif afd == '0':
+                    return
+            else:
+                return
         
-    def adbcommandline(self):#ADB命令行
+    def ADB命令行(self):
         os.system("cls")
         #运行adb
         os.system("cmd adb.exe")
         input("回车以返回主界面：")
         return
-        
-    def error(self):
-        os.system("cls")
-        input('\033[1;31m'+"Unknow Command!Try again!"+'\033[0m')
-        os.system("cls")
-        pass
     
-    def ss(self):#截屏&录屏
+    def 截屏(self):#截屏&录屏
         try:
             while True:
                 os.system("cls")
@@ -343,8 +368,10 @@ class AdbTools(object):
             return
         
     def all_shell(self,command):
-        os.system("adb.exe "+"-s "+choose+" "+command)
-    def deviceinfo(self):
+        ret = os.popen("adb.exe "+"-s "+choose+' '+command).read()
+        return ret
+    
+    def 设备信息(self):
         try:
             os.system("cls")
             print('\033[1;32m')
@@ -387,7 +414,7 @@ class AdbTools(object):
             
         
     
-    def dw(self):
+    def 断开无线调试(self):
         os.system("cls")
         af = input('\033[1;31m'+"确定断开所有已连接的无线连接？输入0返回主界面："+'\033[0m')
         if af == '0':
@@ -405,13 +432,13 @@ class AdbTools(object):
             idx = self.deviceid()
             for index,item in enumerate(idx):
                 print(index+1 ,item)
-            num = int(input("请键入对应数字以选择设备："))-1
+            num = int(input("请键入对应数字以选择设备："))
             try:
                 global choose
                 idc = self.deviceid()
-                choose = idc[num]
+                choose = str(idc[num-1])
                 os.system('cls')
-                input("您已选择"+'\033[4;33m'+choose+'\033[0m'+"作为调试设备"+"，回车以返回主界面：")
+                ad = input("您已选择"+'\033[4;33m'+choose+'\033[0m'+"作为调试设备"+"，回车以返回主界面：")
                 return choose
             except Exception:
                 input("请键入正确的数字，回车以返重试：")
@@ -428,6 +455,7 @@ class AdbTools(object):
                 print("4、激活炼妖壶(设备管理员)")
                 print("5、激活冰箱(设备管理员)")
                 print("6、激活gesture的增强模式")
+                print("7、激活小黑屋")
                 ab = input("键入选项回车以一键激活,输入0以返回主界面:")
                 if ab == '0':
                     return
@@ -456,6 +484,10 @@ class AdbTools(object):
                     os.system('cls')
                     print("命令执行中...")
                     self.all_shell(" shell sh /storage/emulated/0/Android/data/com.omarea/cache/up.sh")
+                elif ab == '7':
+                    os.system('cls')
+                    print("命令执行中...")
+                    self.all_shell(" shell dpm set-device-owner web1n.stopapp/.receiver.AdminReceiver")
                 else:
                     os.system('cls')
                     input("请输入正确的数字，回车以重试：")
