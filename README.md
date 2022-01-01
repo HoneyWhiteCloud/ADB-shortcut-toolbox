@@ -1,4 +1,4 @@
-ADB快捷工具箱 版本：0.4 作者：Honey White Cloud（3303599383）
+ADB快捷工具箱 版本：0.5 作者：Honey White Cloud（3303599383）
 开发语言：Python
 GUI：无（控制台）
 本工具箱遵循GPL-3.0 License开源协议，项目地址："https://github.com/HoneyWhiteCloud/ADB-Tool-Box"（如github打开慢可使用 ："https://hub.fastgit.org/HoneyWhiteCloud/ADB-Tool-Box")
