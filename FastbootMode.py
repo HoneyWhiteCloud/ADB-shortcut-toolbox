@@ -40,20 +40,21 @@ def fastbootbox(choose,chooseandinfo):
             if com == "1":
                 os.system('cls')
                 print('命令执行中……')
-                all_shell("reboot recovery")
+                all_shell(choose,"reboot recovery")
                 os.system('cls')
                 print('\033[1;31m'+"已自动进入adb命令行，输入“exit”即可返回工具箱……"+'\033[0m')
                 print('\033[1;31m'+"本功能只适用于recovery为完整CWM或TWRP的设备，如您不知道什么是recovery，或您不知道您的设备的recovery是什么，请自行百度您设备的型号"+'\033[0m'+"\n")
-                os.system("cmd adb.exe")
+                os.system("cmd /k")
                 return
             elif com == '2':
                 os.system('cls')
                 print('命令执行中……')
-                all_shell("reboot bootloader")
+                all_shell(choose,"reboot bootloader")
                 os.system('cls')
                 print('\033[1;31m'+"已自动进入fastboot命令行，输入“exit”即可返回工具箱……"+'\033[0m')
                 print('\033[1;31m'+"本功能只适用于已解bl锁的设备，如您不知道什么是bl锁，或您想解开bl锁，请自行百度您设备的型号"+'\033[0m'+"\n")
-                os.system("cmd fastboot.exe")
+                print('\033[1;31m'+"命令格式：fastboot [命令选项...] 命令..."+'\033[0m'+"\n")
+                os.system("cmd /k")
                 return
             elif com == '0':
                 return
