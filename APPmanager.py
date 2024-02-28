@@ -1,6 +1,7 @@
 import os
 import shutil
 from re import M, compile
+from subprocess import Popen,PIPE
 
 from Path import MainPath, get_desktop
 from PathChooser import apk路径
@@ -75,7 +76,7 @@ def APKmanager(choose):#安装APK文件
                             filevalue = os.path.splitext(luj)[-1]
                         except:
                             pass
-                        if ".apk" == filevalue:
+                        if ".apk" == filevalue.lower():
 
                             if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
                                 if luj[0] != '"':
@@ -108,7 +109,7 @@ def APKmanager(choose):#安装APK文件
                             break
                         else:
                             os.system("cls")
-                            print('\033[1;31m'+"您输入的文件不是APK文件，请重试！"+'\033[0m')
+                            print('\033[1;31m'+"您输入的文件不是以.apk为后缀的安卓软件安装包文件，请重试！"+'\033[0m')
                             input("\n回车以重试")
                             pass
                 while True:
@@ -341,8 +342,9 @@ def APKmanager(choose):#安装APK文件
                     print("您设备上的所有的第三方软件↓")
                     print('\033[1;32m')
                     if len(info) != 0:
-                        for i in info:
-                            print(i)
+                        for index,i in enumerate(info):
+                            lon = len(list(str(len(info)))) - len(list(str(index+1)))
+                            print("[{0}] {1}".format(str(index+1)," "*lon)+i)
                             pass
                         pass
                     else:

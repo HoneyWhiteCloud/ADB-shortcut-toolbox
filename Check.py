@@ -56,7 +56,7 @@ def check():
                     filevalue = os.path.splitext(luj)[-1]
                 except:
                     pass
-                if ".apk" == filevalue:
+                if ".apk" == filevalue.lower():
                     cmd = os.popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(luj))
                     try:
                         out = cmd.buffer.read().decode('utf-8').strip().replace("'",'').rsplit(":",2)[1]
