@@ -76,7 +76,7 @@ def APKmanager(choose):#安装APK文件
                             filevalue = os.path.splitext(luj)[-1]
                         except:
                             pass
-                        if ".apk" == filevalue.lower():
+                        if ".apk" in filevalue.lower():
 
                             if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
                                 if luj[0] != '"':
@@ -227,6 +227,8 @@ def APKmanager(choose):#安装APK文件
                         print("APK安装中止！\n")
                         print('\033[1;31m'+"请检查您的设备数据线是否松动！以及您是否已在设备上允许ADB安装应用！或检查您设备是否有足够的存储空间来安装此应用！亦或者是您设备不支持降级安装！\n"+'\033[0m')
                         i1 = input("回车即可重新安装APK文件，拖入其他APK可快速安装，输入1可打开文件选择对话框，输入0返回主界面:")
+                        if i1 == "":
+                            pass
                         if i1 == '0':
                             return
                         elif '\\' in i1:
