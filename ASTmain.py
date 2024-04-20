@@ -24,7 +24,7 @@ from wireless import 无线连接, 未连接设备连接
 
 global choose
 choose = '0'
-version = "v0.77.5"#版本号一键修改
+version = "v0.77.6"#版本号一键修改
 
 class ASTmain(object):
     def __init__(self):
