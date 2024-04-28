@@ -71,45 +71,78 @@ def APKmanager(choose):#安装APK文件
                         result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()])
                         break
                     else:
+                        
                         try:
                             filevalue = os.path.splitext(luj)[-1]
                         except:
                             pass
                         if ".apk" in filevalue.lower():
-
-                            if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
-                                if luj[0] != '"':
-                                    luj = '"'+luj
-                                    pass
-                                if luj[-1] != '"':
-                                    luj = luj+'"'
-                                    pass
-
                             os.system("cls")
-                            cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
-                            try:
-                                out = cmd.strip().replace("'",'').rsplit(":",2)[1]
-                                pass
-                            except Exception:
-                                cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
-                                try:
-                                    out = cmd.strip().replace("'",'').rsplit(":",2)[1]
-                                    pass
-                                except Exception:
-                                    out = ""
-                            if out == "":
-                                print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+luj+'\033[0m'))
-                                pass
+                            pass
+                        elif ".1" in filevalue.lower():
+                            os.system("cls")
+                            print('\033[1;31m'+"您输入的文件是以.1结尾的，如果是从QQ下载的文件可直接回车继续(文件名将会被改为ASTtemp.apk)，若不是请输入0重试！"+'\033[0m')
+                            _inp = input("\n你的选择：")
+                            if _inp == "0":
+                                continue
                             else:
-                                print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
-                                pass
-                            result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,luj),shell=False,stdout=PIPE,stderr=PIPE).communicate()])
-                            break
+                                程序原来执行的路径 = os.getcwd()
+                                try:
+                                    if list(luj)[0] == '"':
+                                        i=list(luj)
+                                        del i[0]
+                                        address =os.path.dirname("".join(i))
+                                        pass
+                                    else:
+                                        address = os.path.dirname(luj)
+                                        pass
+                                    os.chdir(address)
+                                    try:
+                                        os.remove("ASTtemp.apk")
+                                        pass
+                                    except Exception:
+                                        pass
+                                    os.rename(os.path.splitext(os.path.basename(luj))[0]+'.1',"ASTtemp.apk")
+                                except Exception as e:
+                                    raise e
+                                os.chdir(程序原来执行的路径)
+                                luj=os.path.join(address,"ASTtemp.apk")
+                            pass
                         else:
                             os.system("cls")
                             print('\033[1;31m'+"您输入的文件不是以.apk为后缀的安卓软件安装包文件，请重试！"+'\033[0m')
                             input("\n回车以重试")
+                            continue
+                        
+                        if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
+                            if luj[0] != '"':
+                                luj = '"'+luj
+                                pass
+                            if luj[-1] != '"':
+                                luj = luj+'"'
+                                pass
+
+                        os.system("cls")
+                        cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                        try:
+                            out = cmd.strip().replace("'",'').rsplit(":",2)[1]
                             pass
+                        except Exception:
+                            cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                            try:
+                                out = cmd.strip().replace("'",'').rsplit(":",2)[1]
+                                pass
+                            except Exception:
+                                out = ""
+                        if out == "":
+                            print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+luj+'\033[0m'))
+                            pass
+                        else:
+                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
+                            pass
+                        result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,luj),shell=False,stdout=PIPE,stderr=PIPE).communicate()])
+                        break
+                    
                 while True:
                     if 'SHARED_USER_INCOMPATIBLE' in result:
                         os.system("cls")
@@ -229,7 +262,7 @@ def APKmanager(choose):#安装APK文件
                     elif 'Performing Streamed Install' in result and 'Success'  not in result:
                         os.system("cls")
                         print(result)
-                        print("APK安装中止！\n")
+                        print("\nAPK安装中止！\n")
                         print('\033[1;31m'+"请检查您的设备数据线是否松动！以及您是否已在设备上允许ADB安装应用！或检查您设备是否有足够的存储空间来安装此应用！亦或者是您设备不支持降级安装！\n"+'\033[0m')
                         i1 = input("回车即可重新安装APK文件，拖入其他APK可快速安装，输入1可打开文件选择对话框，输入0返回主界面:")
                         if i1 == "":
@@ -475,7 +508,6 @@ def APKmanager(choose):#安装APK文件
             elif i == "3":
                 sucuninstallAPKnumlist = []
                 failuninstallAPKnumlist = []
-                killpackname = []
                 info = []
                 apknamelist = []
                 suc = 0
@@ -499,7 +531,10 @@ def APKmanager(choose):#安装APK文件
                         cmd = 'adb.exe -s {} shell pm list package -3 -f'.format(choose)
                         res = os.popen(cmd).read()
                         info_list = compile(r'(/.*/base\.apk)=(.*)').findall(res, M)
-
+                        for i in info_list:#所有apk路径列表
+                            apknamelist.append(i[0])
+                            pass
+                        
                         for index,item in enumerate(info_list):
                             out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                             if out[-1] == "":
@@ -520,7 +555,6 @@ def APKmanager(choose):#安装APK文件
                             lon = len(list(str(len(info_list)))) - len(list(str(index+1)))
                             print("[{0}] {1}".format(str(index+1)," "*lon)+"[{0}]：{1}".format(out,item[1]))
                             info.append("[{0}]：{1}".format(out,item[1]))
-                            killpackname.append(item[1])
                             pass
                         os.popen("adb.exe -s {} shell rm /data/local/tmp/aapt -f".format(choose)).read()#删除临时文件
 
@@ -558,6 +592,11 @@ def APKmanager(choose):#安装APK文件
                                     pass
                                 else:
                                     os.rename("base.apk",path)
+                                    try:
+                                        os.remove(os.path.join(desktop,path))
+                                        pass
+                                    except Exception:
+                                        pass
                                     shutil.move(path,desktop)
                                     try:
                                         os.remove("base.apk")
@@ -588,8 +627,7 @@ def APKmanager(choose):#安装APK文件
                         pass
                     else:
                         try:
-                            i = int(put)
-                            i -= 1
+                            i = int(put)-1
                             pass
                         except Exception:
                             os.system("cls")
@@ -599,8 +637,7 @@ def APKmanager(choose):#安装APK文件
                         os.system("cls")
                         print("命令执行中……请不要断开您的设备！")
                         try:
-                            cmd = "adb.exe -s {0} pull {1} {2}".format(choose,apknamelist[i],desktop+"\\base.apk")
-                            os.popen(cmd).read()
+                            os.popen("adb.exe -s {0} pull {1} {2}".format(choose,apknamelist[i],desktop+"\\base.apk")).read()
                             sucuninstallAPKnumlist.append(i)
                             pass
                         except Exception:
@@ -620,6 +657,11 @@ def APKmanager(choose):#安装APK文件
                                 pass
                             else:
                                 os.rename("base.apk",path)
+                                try:
+                                    os.remove("base.apk")
+                                    pass
+                                except Exception:
+                                    pass
                                 break
                             pass
                         os.chdir(程序原来执行的路径)#返回初始目录
