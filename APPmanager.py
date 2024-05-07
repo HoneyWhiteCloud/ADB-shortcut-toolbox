@@ -1,11 +1,12 @@
 import os
 import shutil
 from re import M, compile
+from pathlib import Path
 from subprocess import Popen,PIPE
 
 from Path import MainPath, get_desktop
 from PathChooser import apk路径
-from Title import TitleDanger, TitleTrue
+from Title import TitleTrue
 
 
 def APKmanager(choose):#安装APK文件
@@ -37,43 +38,47 @@ def APKmanager(choose):#安装APK文件
                     print("#####APK安装界面#####\n\n将APK文件拖入进窗口后回车即可安装，输入1可打开文件选择对话框，输入0即可返回主界面！")
                     print('\033[0m'+'\n')
                     ###################### 
-                    luj = input('\033[1;34m'+"路径："+'\033[0m').strip()#命令行光标
+                    APK文件路径 = input('\033[1;34m'+"路径："+'\033[0m').strip()#命令行光标
                     ###################### 
-                    if luj == '0':
+                    if APK文件路径 == '0':
                         return
-                    elif luj == '':
+                    elif APK文件路径 == '':
                         pass
-                    elif luj == '1':
-                        luj = '"{}"'.format(apk路径())#获取文件选择界面返回的apk文件路径
+                    elif APK文件路径 == '1':
+                        APK文件路径 = '"{}"'.format(apk路径())#获取文件选择界面返回的apk文件路径
                         
-                        if luj == None:#判断路径是否为空
+                        if APK文件路径 == None:#判断路径是否为空
                             continue
                         pass
                         os.system("cls")
-                        cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                        cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(APK文件路径),
+                                    shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
                         try:
                             out = cmd.strip().replace("'",'').rsplit(":",2)[1]
                             pass
                         except Exception:
-                            cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                            cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(APK文件路径),
+                                        shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
                             try:
                                 out = cmd.strip().replace("'",'').rsplit(":",2)[1]
                                 pass
                             except Exception:
                                 out = ""
                         if out == "":
-                            print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+luj+'\033[0m'))
+                            print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+APK文件路径+'\033[0m'))
                             pass
                         else:
-                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
+                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,APK文件路径))
                             pass
                         
-                        result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()])
+                        result = "\n".join([i.decode("utf-8") 
+                                            for i in Popen("adb.exe -s {0} install -r {1}".format(choose,APK文件路径),
+                                                                             shell=True,stdout=PIPE,stderr=PIPE).communicate()])
                         break
                     else:
                         
                         try:
-                            filevalue = os.path.splitext(luj)[-1]
+                            filevalue = os.path.splitext(APK文件路径)[-1]
                         except:
                             pass
                         if ".apk" in filevalue.lower():
@@ -81,20 +86,20 @@ def APKmanager(choose):#安装APK文件
                             pass
                         elif ".1" in filevalue.lower():
                             os.system("cls")
-                            print('\033[1;31m'+"您输入的文件是以.1结尾的，如果是从QQ下载的文件可直接回车继续(文件名将会被改为ASTtemp.apk)，若不是请输入0重试！"+'\033[0m')
+                            print('\033[1;31m'+"您输入的文件是以.1结尾的，如果是从QQ下载的文件可直接回车继续(文件名将会被改为以.apk结尾的文件)，若不是请输入0重试！"+'\033[0m')
                             _inp = input("\n你的选择：")
                             if _inp == "0":
                                 continue
                             else:
                                 程序原来执行的路径 = os.getcwd()
                                 try:
-                                    if list(luj)[0] == '"':
-                                        i=list(luj)
+                                    if list(APK文件路径)[0] == '"':
+                                        i=list(APK文件路径)
                                         del i[0]
                                         address =os.path.dirname("".join(i))
                                         pass
                                     else:
-                                        address = os.path.dirname(luj)
+                                        address = os.path.dirname(APK文件路径)
                                         pass
                                     os.chdir(address)
                                     try:
@@ -102,11 +107,12 @@ def APKmanager(choose):#安装APK文件
                                         pass
                                     except Exception:
                                         pass
-                                    os.rename(os.path.splitext(os.path.basename(luj))[0]+'.1',"ASTtemp.apk")
+                                    os.rename(os.path.splitext('{}.1'.format(os.path.basename(APK文件路径))[0]),
+                                              "{}.apk".format(Path(APK文件路径).stem))#虽然这边会把文件命名为xxx.apk.apk但是为了出现一些意外情况就先这样了
                                 except Exception as e:
                                     raise e
                                 os.chdir(程序原来执行的路径)
-                                luj=os.path.join(address,"ASTtemp.apk")
+                                APK文件路径=os.path.join(address,"ASTtemp.apk")
                             pass
                         else:
                             os.system("cls")
@@ -114,33 +120,36 @@ def APKmanager(choose):#安装APK文件
                             input("\n回车以重试")
                             continue
                         
-                        if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
-                            if luj[0] != '"':
-                                luj = '"'+luj
+                        if " " in APK文件路径:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
+                            if APK文件路径[0] != '"':
+                                APK文件路径 = '"'+APK文件路径
                                 pass
-                            if luj[-1] != '"':
-                                luj = luj+'"'
+                            if APK文件路径[-1] != '"':
+                                APK文件路径 = APK文件路径+'"'
                                 pass
 
                         os.system("cls")
-                        cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                        cmd = Popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(APK文件路径),
+                                    shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
                         try:
                             out = cmd.strip().replace("'",'').rsplit(":",2)[1]
                             pass
                         except Exception:
-                            cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(luj),shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
+                            cmd = Popen('aapt.exe dump badging {} | findstr application-label:'.format(APK文件路径),
+                                        shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8')
                             try:
                                 out = cmd.strip().replace("'",'').rsplit(":",2)[1]
                                 pass
                             except Exception:
                                 out = ""
                         if out == "":
-                            print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+luj+'\033[0m'))
+                            print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+APK文件路径+'\033[0m'))
                             pass
                         else:
-                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
+                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,APK文件路径))
                             pass
-                        result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,luj),shell=False,stdout=PIPE,stderr=PIPE).communicate()])
+                        result = "\n".join([i.decode("utf-8") for i in Popen("adb.exe -s {0} install -r {1}".format(choose,APK文件路径),
+                                                                             shell=False,stdout=PIPE,stderr=PIPE).communicate()])
                         break
                     
                 while True:
@@ -273,7 +282,7 @@ def APKmanager(choose):#安装APK文件
                             i = i1
                             pass
                         else:
-                            i = luj
+                            i = APK文件路径
                             pass
                         pass
                     else:
@@ -290,7 +299,7 @@ def APKmanager(choose):#安装APK文件
                     elif i == '':
                         pass
                     elif i == '1':
-                        luj = apk路径()
+                        APK文件路径 = apk路径()
 
                         os.system("cls")
                         cmd = os.popen('aapt.exe dump badging {} | findstr application-label-zh-CN:'.format(i))
@@ -308,23 +317,23 @@ def APKmanager(choose):#安装APK文件
                             print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+i+'\033[0m'))
                             pass
                         else:
-                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
+                            print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,APK文件路径))
                             pass
                         result = os.popen("adb.exe -s {} install -r {}".format(choose,i)).read()
 
                     elif '\\' in i:
                         try:
-                            filevalue = os.path.splitext(luj)[-1]
+                            filevalue = os.path.splitext(APK文件路径)[-1]
                         except:
                             pass
                         if ".apk" == filevalue:
 
-                            if " " in luj:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
-                                if luj[0] != '"':
-                                    luj = '"'+luj
+                            if " " in APK文件路径:#判断路径中是否有空格，然后判断是否被双引号括起来，如果没有则添加双引号
+                                if APK文件路径[0] != '"':
+                                    APK文件路径 = '"'+APK文件路径
                                     pass
-                                if luj[-1] != '"':
-                                    luj = luj+'"'
+                                if APK文件路径[-1] != '"':
+                                    APK文件路径 = APK文件路径+'"'
                                     pass
 
                             os.system("cls")
@@ -343,7 +352,7 @@ def APKmanager(choose):#安装APK文件
                                 print("应用：{} 安装中，请耐心等待……".format('\033[4;33m'+i+'\033[0m'))
                                 pass
                             else:
-                                print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,luj))
+                                print('应用：\033[4;33m[{}]\033[0m{} 安装中，请耐心等待……'.format(out,APK文件路径))
                                 pass
                             result = os.popen("adb.exe -s {} install -r {}".format(choose,i)).read()
                         else:
@@ -393,9 +402,13 @@ def APKmanager(choose):#安装APK文件
                         info_list = compile(r'(/.*/base\.apk)=(.*)').findall(res, M)
 
                         for index,item in enumerate(info_list):
-                            out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                            out = "\n".join([i.decode("utf-8") 
+                                             for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),
+                                                                              shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                             if out[-1] == "":
-                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                out = "\n".join([i.decode("utf-8") 
+                                                 for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),
+                                                                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                 if out[-1] == "":
                                     out = "空应用名"
                                     pass
@@ -536,9 +549,13 @@ def APKmanager(choose):#安装APK文件
                             pass
                         
                         for index,item in enumerate(info_list):
-                            out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                            out = "\n".join([i.decode("utf-8") 
+                                             for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),
+                                                                              shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                             if out[-1] == "":
-                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                out = "\n".join([i.decode("utf-8") 
+                                                 for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),
+                                                                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                 if out[-1] == "":
                                     out = "空应用名"
                                     pass
@@ -723,9 +740,11 @@ def APKmanager(choose):#安装APK文件
                             info_list = compile(r'(/.*/base\.apk)=(.*)').findall(res, M)
 
                             for index,item in enumerate(info_list):
-                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),
+                                                                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                 if out[-1] == "":
-                                    out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                    out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),
+                                                                                      shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                     if out[-1] == "":
                                         out = "空应用名"
                                         pass
@@ -842,9 +861,11 @@ def APKmanager(choose):#安装APK文件
                             info_list = compile(r'(/.*/base\.apk)=(.*)').findall(res, M)
 
                             for index,item in enumerate(info_list):
-                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label-zh-CN:'.format(choose,item[0]),
+                                                                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                 if out[-1] == "":
-                                    out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
+                                    out = "\n".join([i.decode("utf-8") for i in Popen('adb.exe -s {} shell /data/local/tmp/aapt d badging {} | findstr application-label:'.format(choose,item[0]),
+                                                                                      shell=True,stdout=PIPE,stderr=PIPE).communicate()]).strip().replace("'","").rsplit(":",2)
                                     if out[-1] == "":
                                         out = "空应用名"
                                         pass
